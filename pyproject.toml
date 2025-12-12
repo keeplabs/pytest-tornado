@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytest-tornado"
+version = "0.9.dev1"
+description = "A py.test plugin providing fixtures and markers to simplify testing of asynchronous tornado applications."
+readme = "README.rst"
+requires-python = ">=3.10"
+license = {text = "Apache License, Version 2.0"}
+authors = [
+    {name = "Eugeniy Kalinin", email = "burump@gmail.com"}
+]
+maintainers = [
+    {name = "Vidar Tonaas Fauske", email = "vidartf@gmail.com"}
+]
+keywords = ["pytest", "py.test", "tornado", "async", "asynchronous", "testing", "unit tests", "plugin"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Plugins",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = [
+    "pytest>=3.6",
+    "tornado>=4.1",
+    "packaging",
+]
+
+[project.urls]
+Homepage = "https://github.com/eugeniy/pytest-tornado"
+
+[project.entry-points.pytest11]
+tornado = "pytest_tornado.plugin"
+
+[tool.setuptools]
+packages = ["pytest_tornado"]
