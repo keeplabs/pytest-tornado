@@ -1,8 +1,7 @@
+import asyncio
 import os
-import types
 import inspect
 import datetime
-from packaging.version import parse as parse_version
 import pytest
 import tornado
 import tornado.gen
@@ -11,8 +10,6 @@ import tornado.httpserver
 import tornado.httpclient
 
 iscoroutinefunction = inspect.iscoroutinefunction
-
-_PYTEST_VERSION = parse_version(pytest.__version__)
 
 
 def _get_async_test_timeout():
@@ -52,21 +49,12 @@ def pytest_configure(config):
 
 
 def _argnames(func):
-    if hasattr(inspect, "signature"):
-        sig = inspect.signature(func)
-        return [
-            name
-            for name, param in sig.parameters.items()
-            if param.default is param.empty
-        ]
-    else:
-        spec = inspect.getargspec(func)
-        if spec.defaults:
-            return spec.args[: -len(spec.defaults)]
-        if isinstance(func, types.FunctionType):
-            return spec.args
-        # Func is a bound method, skip "self"
-        return spec.args[1:]
+    sig = inspect.signature(func)
+    return [
+        name
+        for name, param in sig.parameters.items()
+        if param.default is param.empty
+    ]
 
 
 def _timeout(item):
@@ -77,13 +65,10 @@ def _timeout(item):
     return default_timeout
 
 
-@pytest.mark.tryfirst
+@pytest.hookimpl(tryfirst=True)
 def pytest_pycollect_makeitem(collector, name, obj):
     if collector.funcnamefilter(name) and inspect.isgeneratorfunction(obj):
-        if _PYTEST_VERSION >= parse_version("5.4.0"):
-            item = pytest.Function.from_parent(collector, name=name)
-        else:
-            item = pytest.Function(name, parent=collector)
+        item = pytest.Function.from_parent(collector, name=name)
         if "gen_test" in item.keywords:
             return list(collector._genfunctions(name, obj))
 
@@ -94,7 +79,7 @@ def pytest_runtest_setup(item):
         item.fixturenames.append("io_loop")
 
 
-@pytest.mark.tryfirst
+@pytest.hookimpl(tryfirst=True)
 def pytest_pyfunc_call(pyfuncitem):
     gen_test_mark = pyfuncitem.get_closest_marker("gen_test")
     if gen_test_mark:
@@ -132,12 +117,12 @@ def pytest_pyfunc_call(pyfuncitem):
 @pytest.fixture
 def io_loop(request):
     """Create an instance of the `tornado.ioloop.IOLoop` for each test case."""
-    io_loop = tornado.ioloop.IOLoop()
-    io_loop.make_current()
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    io_loop = tornado.ioloop.IOLoop.current()
 
     def _close():
-        io_loop.clear_current()
         io_loop.close(all_fds=True)
+        asyncio.set_event_loop(None)
 
     request.addfinalizer(_close)
     return io_loop

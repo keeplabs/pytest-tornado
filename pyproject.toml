@@ -30,9 +30,8 @@ classifiers = [
     "Topic :: Software Development :: Testing",
 ]
 dependencies = [
-    "pytest>=3.6",
-    "tornado>=4.1",
-    "packaging",
+    "pytest>=9.0",
+    "tornado>=6.5",
 ]
 
 [project.urls]
