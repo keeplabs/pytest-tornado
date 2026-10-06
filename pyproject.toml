@@ -30,7 +30,7 @@ classifiers = [
     "Topic :: Software Development :: Testing",
 ]
 dependencies = [
-    "pytest>=9.0",
+    "pytest>=9",
     "tornado>=6.5",
 ]
 
