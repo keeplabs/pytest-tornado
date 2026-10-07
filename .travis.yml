@@ -6,7 +6,7 @@ python:
     - "3.11"
     - "3.12"
 env:
-    - TORNADO_VERSION=6.5 PYTEST_VERSION=9.0
+    - TORNADO_VERSION=6.5.10 PYTEST_VERSION=9.0
 install:
     - pip install tornado~=$TORNADO_VERSION pytest~=$PYTEST_VERSION
     - pip install PyOpenSSL  # used to create a cert for testing
